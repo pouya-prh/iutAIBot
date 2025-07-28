@@ -2,7 +2,7 @@ from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.ext import ConversationHandler
 from keyboard import Keyboard
-
+from db_manager import DbManager
 SUGGESTION = 1 
 
 
@@ -31,9 +31,9 @@ class Suggestion:
         suggestion = text
         user = update.effective_user
         telegram_id = user.id
-
-        print(f"🔔 Suggestion from {telegram_id}: {suggestion}")
-
+        username = user.username
+        
+        DbManager.submit_suggestion(telegram_id,username,suggestion)
         await update.message.reply_text(
             "✅ پیشنهاد شما دریافت شد. ممنون از همکاری شما!",
             reply_markup=Keyboard.main_menu_keyboard()
