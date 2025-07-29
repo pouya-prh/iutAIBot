@@ -38,3 +38,10 @@ class Suggestion:
             reply_markup=Keyboard.main_menu_keyboard()
         )
         return ConversationHandler.END
+    
+    async def cancel_suggestion(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.message.reply_text(
+            "❌ ثبت نظر لغو شد. به منوی اصلی برگشتید.",
+            reply_markup=Keyboard.main_menu_keyboard()
+        )
+        return ConversationHandler.END

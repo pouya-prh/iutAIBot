@@ -50,6 +50,7 @@ class DbManager:
                 'status': row['status'],
                 'capacity': row['capacity'],
                 'cover_image': row['cover_image'],
+                'payment': row['payment'],
             }
             events.append(Events(**kwargs))
         return events
@@ -80,14 +81,21 @@ class DbManager:
         if c.fetchone():
             conn.close()
             return 'already registered'
-
-        registered_At = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        c.execute("INSERT INTO Enrollments (event_ID, user_ID, registered_at, status) VALUES (?, ?, ?, ?)",
-                (event_id, user_id, registered_At, 'confirmed'))
-        c.execute("UPDATE Events SET capacity = capacity - 1 WHERE ID = ?", (event_id,))
-        conn.commit()
+        c.execute(" SELECT payment FROM Events WHERE ID = ?", (event_id, ))
+        event_row = c.fetchone()
         conn.close()
-        return 'successfully registered'
+        if event_row == 0:
+            registered_At = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            c.execute("INSERT INTO Enrollments (event_ID, user_ID, registered_at, status) VALUES (?, ?, ?, ?)",
+                    (event_id, user_id, registered_At, 'confirmed'))
+            c.execute("UPDATE Events SET capacity = capacity - 1 WHERE ID = ?", (event_id,))
+            conn.commit()
+            conn.close()
+            return 'successfully registered'
+        else:
+            return 'payment'
+            
+        
 
             
 

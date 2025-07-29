@@ -50,20 +50,21 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     app = Application.builder().token(TOKEN).build()
-    Logs.start()
-    app.add_handler(CommandHandler("start", start))
     
-    conv_handler = ConversationHandler(
+    Logs.start()
+    suggestion_conv_handler = ConversationHandler(
         entry_points=[MessageHandler(filters.Regex("^ثبت پیشنهاد💡$"), Suggestion.ask_for_suggestion)],
         states={
             SUGGESTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, Suggestion.handle_suggestion)],
         },
-        fallbacks=[MessageHandler(filters.Regex("^بازگشت 🔙$"), Suggestion.handle_suggestion)]
+        fallbacks=[
+                   MessageHandler(filters.COMMAND, Suggestion.cancel_suggestion), 
+                   ]
     )
     
     profile_conv_handler = ConversationHandler(
     entry_points=[
-        MessageHandler(filters.Regex("^ثبت یا ویرایش پروفایل کاربری👤$"), UserProfile.start_profile_registration)
+        MessageHandler(filters.Regex("^ثبت یا ویرایش پروفایل کاربری👤$"), UserProfile.start_profile_registration),
     ],
     states={
         UserProfile.SHOW_PROFILE_OPTIONS: [
@@ -86,14 +87,13 @@ def main():
         ],
     },
     fallbacks=[
-        MessageHandler(filters.Regex("^بازگشت 🔙$"), UserProfile.cancel_profile_registration),
-        MessageHandler(filters.Regex("^🔙 بازگشت به منوی اصلی$"), UserProfile.cancel_profile_registration),
-        CommandHandler('cancel', UserProfile.cancel_profile_registration)
+        MessageHandler(filters.COMMAND, UserProfile.cancel_profile_registration), 
     ]
 )
+ 
     app.add_handler(profile_conv_handler)
-    
-    app.add_handler(conv_handler)
+    app.add_handler(suggestion_conv_handler) 
+    app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(
     event_register.handle_event_register_callback, pattern=r".+_register_\d+$"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))

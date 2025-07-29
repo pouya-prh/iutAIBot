@@ -7,6 +7,7 @@ from db_manager import DbManager
 class UserProfile:
     SHOW_PROFILE_OPTIONS, PROFILE_FIRST_NAME, PROFILE_LAST_NAME, PROFILE_PHONE, PROFILE_UNIVERSITY, PROFILE_ENTRY_YEAR = range(6)
 
+    
     @staticmethod
     async def start_profile_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
@@ -18,7 +19,7 @@ class UserProfile:
             
             keyboard = [
                 [KeyboardButton("✏️ ویرایش پروفایل")],
-                [KeyboardButton("🔙 بازگشت به منوی اصلی")]
+                [KeyboardButton("بازگشت 🔙")]
             ]
             
             await update.message.reply_text(
@@ -51,12 +52,17 @@ class UserProfile:
             )
             return UserProfile.PROFILE_FIRST_NAME
             
-        elif text == "🔙 بازگشت به منوی اصلی":
+        elif text =="بازگشت 🔙" :
             return await UserProfile.cancel_profile_registration(update, context)    
         
         
     @staticmethod  
     async def handle_first_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        text = update.message.text
+        
+        if text =="بازگشت 🔙":
+            return await UserProfile.cancel_profile_registration(update, context)
+        
         first_name = update.message.text.strip()
         
         if len(first_name) < 2:
@@ -75,7 +81,10 @@ class UserProfile:
 
     @staticmethod  
     async def handle_last_name(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        text = update.message.text
         last_name = update.message.text.strip()
+        if text =="بازگشت 🔙":
+            return await UserProfile.cancel_profile_registration(update, context)
         
         if len(last_name) < 2:
             await update.message.reply_text(
@@ -93,6 +102,11 @@ class UserProfile:
 
     @staticmethod 
     async def handle_phone(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        text = update.message.text
+        
+        if text =="بازگشت 🔙":
+            return await UserProfile.cancel_profile_registration(update, context)
+        
         phone = update.message.text.strip()
         
         if not phone.isdigit() or len(phone) < 11:
@@ -111,6 +125,10 @@ class UserProfile:
 
     @staticmethod 
     async def handle_university(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        text = update.message.text
+        
+        if text =="بازگشت 🔙":
+            return await UserProfile.cancel_profile_registration(update, context)
         university = update.message.text.strip()
         
         if len(university) < 2:
@@ -129,6 +147,11 @@ class UserProfile:
 
     @staticmethod  
     async def handle_entry_year(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        text = update.message.text
+        
+        if text =="بازگشت 🔙":
+            return await UserProfile.cancel_profile_registration(update, context)
+        
         entry_year = update.message.text.strip()
 
         try:

@@ -15,6 +15,12 @@ def to_text(event):
                 text += f"👥 <b> ظرفیت: نامحدود</b>\n"
             else:    
                 text += f"👥 <b>ظرفیت:</b> {event.capacity}\n"
+       
+        if event.payment == 0:
+            text += f"💲 <b>هزینه:</b> رایگان\n"
+        else:
+            text += f"💲 <b>هزینه:</b> {event.payment} تومان\n'"
+            
         return text
 
 async def show_events(update: Update, context):

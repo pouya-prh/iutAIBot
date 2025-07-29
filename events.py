@@ -1,7 +1,7 @@
 
 
 class Events:
-    def __init__(self, ID, title, description, start_time, location, status, capacity, cover_image):
+    def __init__(self, ID, title, description, start_time, location, status, capacity, cover_image, payment):
         self.ID = ID
         self.title = title
         self.description = description
@@ -10,5 +10,6 @@ class Events:
         self.status = status
         self.capacity = capacity
         self.cover_image = cover_image
+        self.payment = payment
    
         
