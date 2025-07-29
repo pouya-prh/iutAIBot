@@ -2,6 +2,7 @@ from telegram.constants import ParseMode
 from db_manager import DbManager
 from telegram import Update
 from events import Events
+from keyboard import Keyboard
 
 def to_text(event):
         text = f"📌 <b>{event.title}</b>\n"
@@ -10,9 +11,10 @@ def to_text(event):
         if event.location:
             text += f"📍 <b>مکان:</b> {event.location}\n"
         if event.capacity:
-            text += f"👥 <b>ظرفیت:</b> {event.capacity}\n"
-        if event.status:
-            text += f"وضعیت رویداد: <b>{event.status}</b>\n"
+            if event.capacity == -1 :
+                text += f"👥 <b> ظرفیت: نامحدود</b>\n"
+            else:    
+                text += f"👥 <b>ظرفیت:</b> {event.capacity}\n"
         return text
 
 async def show_events(update: Update, context):
@@ -32,12 +34,14 @@ async def show_events(update: Update, context):
                     chat_id=chat_id,
                     photo=photo_file,        
                     caption=msg,
-                    parse_mode=ParseMode.HTML
+                    parse_mode=ParseMode.HTML,
+                    reply_markup = Keyboard.event_register_keyboard(ev.title, ev.ID)
                 )
         else:
             await context.bot.send_message(
                 chat_id=chat_id,
                 text=msg,
-                parse_mode=ParseMode.HTML
+                parse_mode=ParseMode.HTML,
+                reply_markup = Keyboard.event_register_keyboard(ev.title, ev.ID)
             )
         
