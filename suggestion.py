@@ -8,12 +8,11 @@ SUGGESTION = 1
 
 class Suggestion:
     async def ask_for_suggestion(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        reply_keyboard = [["بازگشت 🔙"]]
-        markup = ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
+        
 
         await update.message.reply_text(
             "💡 لطفاً پیشنهاد خود را ارسال کنید.\nیا با 'بازگشت 🔙' به منوی اصلی برگردید.",
-            reply_markup=markup
+            reply_markup=Keyboard.back()
         )
 
         return SUGGESTION

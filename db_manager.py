@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+from events import Events 
 
 class DbManager:
     
@@ -13,13 +14,12 @@ class DbManager:
                 INSERT INTO Users (telegram_ID, username, first_name, last_name, joined_at, last_active)
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (telegram_id, username, first_name, last_name, joined_at, joined_at))
-            conn.commit()
-            conn.close()
         else:
             last_active = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             c.execute("UPDATE Users SET last_active = ? WHERE telegram_ID = ?",(last_active, telegram_id))
-            conn.commit()
-            conn.close()
+        
+        conn.commit()
+        conn.close()
         
     def submit_suggestion(telegram_id, username, suggestion):
         conn = sqlite3.connect("sqlite3.db")
@@ -29,3 +29,28 @@ class DbManager:
 
         conn.commit()
         conn.close()
+        
+    def return_events():
+        conn = sqlite3.connect("sqlite3.db")
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        query = "SELECT * FROM Events WHERE status = 1"
+        c.execute(query)
+        rows = c.fetchall()
+        conn.close()
+
+        events = []
+        for row in rows:
+            kwargs = {
+                'title': row['title'],
+                'description': row['description'],
+                'start_time': row['start_time'],
+                'location': row['location'],
+                'status': row['status'],
+                'capacity': row['capacity'],
+                'cover_image': row['cover_image'],
+            }
+            events.append(Events(**kwargs))
+        return events
+
+        

@@ -10,4 +10,7 @@ class Keyboard:
             ["ثبت پیشنهاد💡", "دوره‌ها📚"]
         ]
         return ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
-        
+    
+    def back():
+        reply_keyboard = [["بازگشت 🔙"]]
+        return ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)

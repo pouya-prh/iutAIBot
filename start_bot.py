@@ -5,6 +5,7 @@ import about
 from db_manager import DbManager
 from keyboard import Keyboard
 from suggestion import Suggestion, SUGGESTION
+from show_events import show_events
 TOKEN = "" 
 try:
     with open('token.txt', 'r') as f:
@@ -36,9 +37,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if text == "درباره ما❔":
         await about.about_us(update, context)
     elif text == "رویدادها📅":
-        await update.message.reply_text("در حال حاضر رویدادی ثبت نشده. منتظر خبرهای جدید باشید!")
-    # elif text == "ثبت پیشنهاد💡":
-    #     await Suggestion.ask_for_suggestion()
+        await show_events(update,context)
     elif text == "دوره‌ها📚":
         await update.message.reply_text("در حال حاضر اطلاعاتی ثبت نشده. منتظر خبرهای جدید باشید!")
     else:
