@@ -1,6 +1,7 @@
 from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram.ext import ConversationHandler, CallbackQueryHandler
+from telegram.request import HTTPXRequest
 import about
 from db_manager import DbManager
 from keyboard import Keyboard
@@ -11,6 +12,7 @@ from logs import Logs
 from user_profile import UserProfile
 from show_courses import show_courses
 import course_register
+from display_user_event_course import display_user_event ,display_user_course
 TOKEN = "" 
 try:
     with open('token.txt', 'r') as f:
@@ -47,11 +49,20 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_events(update,context)
     elif text == "دوره‌ها📚":
         await show_courses(update, context)
+    elif text == "رویداد های من📆" :
+        await display_user_event(update, context)
+    elif text == "دوره های من📘" :
+        await display_user_course(update, context)
     else:
         await update.message.reply_text("دستور نامشخص است. لطفاً از دکمه‌ها استفاده کنید.")
 
 def main():
-    app = Application.builder().token(TOKEN).build()
+    
+    request = HTTPXRequest(
+    connect_timeout=10.0,  
+    read_timeout=30.0  
+)
+    app = Application.builder().token(TOKEN).request(request).build()
     
     Logs.start()
     suggestion_conv_handler = ConversationHandler(

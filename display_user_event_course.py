@@ -1,9 +1,7 @@
-from telegram.constants import ParseMode
-from db_manager import DbManager
 from telegram import Update
+from db_manager import DbManager
+from telegram.constants import ParseMode
 from events import Events
-from keyboard import Keyboard
-
 def to_text(event):
         text = f"📌 <b>{event.title}</b>\n"
         text += f"{event.description}\n"
@@ -23,31 +21,24 @@ def to_text(event):
             
         return text
 
-async def show_events(update: Update, context):
-    events_list = DbManager.return_events()
+async def display_user_event(update: Update, context):
+    telegram_id = update.effective_user.id
+    events_list = DbManager.return_user_event(telegram_id)
     
     chat_id = update.effective_chat.id
 
     if not events_list or len(events_list) == 0:
         await context.bot.send_message(chat_id=chat_id, text="هیچ رویدادی وجود ندارد.")
         return
-
+    
     for ev in events_list:
         msg = to_text(ev)
-        if ev.cover_image:
-            with open(ev.cover_image, "rb") as photo_file:
-                await context.bot.send_photo(
-                    chat_id=chat_id,
-                    photo=photo_file,        
-                    caption=msg,
-                    parse_mode=ParseMode.HTML,
-                    reply_markup = Keyboard.event_register_keyboard(ev.title, ev.ID)
-                )
-        else:
-            await context.bot.send_message(
-                chat_id=chat_id,
-                text=msg,
-                parse_mode=ParseMode.HTML,
-                reply_markup = Keyboard.event_register_keyboard(ev.title, ev.ID)
-            )
-        
+        await context.bot.send_message(
+            chat_id=chat_id,
+            text=msg,
+            parse_mode=ParseMode.HTML,
+        )
+
+
+def display_user_course(update, context):
+    pass

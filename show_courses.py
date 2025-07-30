@@ -7,11 +7,11 @@ from keyboard import Keyboard
 def to_text(corese):
         text = f"📌 <b>{corese.title}</b>\n"
         text += f"{corese.description}\n"
-        test += f"👨‍🏫 <b>مدرس:</b> {corese.instructor}\n"
+        text += f"👨‍🏫 <b>مدرس:</b> {corese.instructor}\n"
         if corese.payment == 0:
             text += f"💲 <b>هزینه:</b> رایگان\n"
         else:
-            text += f"💲 <b>هزینه:</b> {corese.payment} تومان\n'"
+            text += f"💲 <b>هزینه:</b> {corese.payment} تومان\n"
             
         return text
 

@@ -191,16 +191,16 @@ class DbManager:
         if payment == 0:
             registered_At = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             c.execute(
-                "INSERT INTO CourseEnrollments (user_ID, first_name, last_name, course_ID, course_title, registered_at) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
-                (user_id, first_name, last_name, course_id, course_title, registered_At)
+                "INSERT INTO CourseEnrollments (user_ID, first_name, last_name, course_ID, course_title) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (user_id, first_name, last_name, course_id, course_title)
             )
             conn.commit()
             conn.close()
             return 'successfully registered'
         else:
             conn.close()
-            return 'payment required'
+            return 'payment'
         
         
     def return_courses():
@@ -224,3 +224,45 @@ class DbManager:
             }
             courses.append(Course(**kwargs))
         return courses
+    
+    
+
+    def return_user_event(telegram_id):
+        conn = sqlite3.connect('sqlite3.db')
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        
+        c.execute("SELECT ID FROM Users WHERE telegram_ID = ?", (telegram_id,))
+        user_row = c.fetchone()
+        if user_row is None:
+            conn.close()
+            return None
+        user_id = user_row['ID']
+
+        c.execute("SELECT event_ID FROM Enrollments WHERE user_ID = ?", (user_id,))
+        rows = c.fetchall()
+
+        events = []
+        for row in rows:
+            event_id = row['event_ID']
+            c.execute("SELECT * FROM Events WHERE ID = ?", (event_id,))
+            event = c.fetchone()
+            if event:  
+                kwargs = {
+                    'ID': event['ID'],
+                    'title': event['title'],
+                    'description': event['description'],
+                    'start_time': event['start_time'],
+                    'location': event['location'],
+                    'status': event['status'],
+                    'capacity': event['capacity'],
+                    'cover_image': event['cover_image'],
+                    'payment': event['payment'],
+                }
+                events.append(Events(**kwargs))
+
+        conn.close()
+        return events
+
+            
+        

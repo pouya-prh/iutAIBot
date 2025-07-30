@@ -2,14 +2,14 @@ from telegram import Update, ReplyKeyboardMarkup, KeyboardButton
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 
-
 class Keyboard:
     
     def main_menu_keyboard():
         reply_keyboard = [
-            ["درباره ما❔", "رویدادها📅"],
-            ["ثبت پیشنهاد💡", "دوره‌ها📚"],
-            ["ثبت یا ویرایش پروفایل کاربری👤"]
+            ["ثبت یا ویرایش پروفایل کاربری👤"],
+            ["دوره‌ها📚", "رویدادها📅"],
+            ["دوره های من📘", "رویداد های من📆"],
+            ["ثبت پیشنهاد💡", "درباره ما❔"],
         ]
         return ReplyKeyboardMarkup(reply_keyboard, resize_keyboard=True)
     
