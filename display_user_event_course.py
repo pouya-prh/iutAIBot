@@ -5,7 +5,7 @@ from events import Events
 from course import Course
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
+import asyncio
 
 def to_text(event):
         text = f"📌 <b>{event.title}</b>\n"
@@ -59,3 +59,28 @@ async def display_user_course(update: Update, context: ContextTypes.DEFAULT_TYPE
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("✅ لطفاً یکی از دوره‌ها را انتخاب کنید:", reply_markup=reply_markup)
 
+
+async def display_course(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+
+    data = query.data 
+    if not data.startswith("course:"):
+        await query.message.reply_text("❌ داده‌ی نامعتبر")
+        return
+
+    course_id = int(data.split("course:")[1])
+    
+    all_episodes = DbManager.return_all_episode_of_course(course_id)
+    
+    if not all_episodes:
+        await query.message.reply_text("❌ اپیزودی برای این دوره یافت نشد.")
+        return
+
+    for file_id, title, instructor, episode in all_episodes:
+        caption = f"🎬 {title}\n👨‍🏫 مدرس: {instructor}\n🎞 قسمت: {episode}"
+        await context.bot.send_video(
+            chat_id=query.from_user.id,
+            video=file_id,
+            caption=caption
+        )

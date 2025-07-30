@@ -84,8 +84,7 @@ class DbManager:
             return 'already registered'
         c.execute(" SELECT payment FROM Events WHERE ID = ?", (event_id, ))
         event_row = c.fetchone()
-        conn.close()
-        if event_row == 0:
+        if event_row[0] == 0:
             registered_At = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             c.execute("INSERT INTO Enrollments (event_ID, user_ID, registered_at, status) VALUES (?, ?, ?, ?)",
                     (event_id, user_id, registered_At, 'confirmed'))
@@ -94,6 +93,7 @@ class DbManager:
             conn.close()
             return 'successfully registered'
         else:
+            conn.close()
             return 'payment'
             
     def get_user_profile(telegram_id):
@@ -282,4 +282,16 @@ class DbManager:
         conn.close()
         return courses
     
-    
+    def return_all_episode_of_course(course_id):
+        conn = sqlite3.connect('sqlite3.db')
+        c = conn.cursor()
+        
+        c.execute(" SELECT message_ID, course_title, instructor, episode FROM Course_MessageID WHERE course_ID = ?", (course_id, ))
+        rows = c.fetchall()
+        file_id = []
+        if rows :
+            for row in rows:
+               file_id.append((row[0], row[1], row[2], row[3]))
+        else :
+            return None
+        return file_id
