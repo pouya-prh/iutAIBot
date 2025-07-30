@@ -1,7 +1,8 @@
 import sqlite3
 from datetime import datetime
 from events import Events 
-
+from datetime import datetime
+from course import Course
 class DbManager:
     
     def insert_user(telegram_id, username, first_name, last_name):
@@ -153,3 +154,73 @@ class DbManager:
         except Exception as e:
             print(f"Error saving user profile: {e}")
             conn.rollback()
+
+
+
+    def course_register_db(telegram_id, course_id):
+        conn = sqlite3.connect("sqlite3.db")
+        c = conn.cursor()
+
+        c.execute("SELECT ID, is_active FROM Users WHERE telegram_ID = ?", (telegram_id,))
+        user_row = c.fetchone()
+        if user_row is None:
+            conn.close()
+            return 'user not found'
+        elif user_row[1] == 0:
+            conn.close()
+            return 'user has been deactivated'
+        user_id = user_row[0]
+
+        c.execute("SELECT first_name, last_name FROM UserProfile WHERE telegram_ID = ?", (telegram_id,))
+        userprofile_row = c.fetchone()
+        first_name = userprofile_row[0] if userprofile_row else ''
+        last_name = userprofile_row[1] if userprofile_row else ''
+
+        c.execute("SELECT title, payment FROM Course WHERE ID = ?", (course_id,))
+        course_row = c.fetchone()
+        if course_row is None:
+            conn.close()
+            return 'course not found'
+        course_title, payment = course_row
+
+        c.execute("SELECT 1 FROM CourseEnrollments WHERE course_ID = ? AND user_ID = ?", (course_id, user_id))
+        if c.fetchone():
+            conn.close()
+            return 'already registered'
+
+        if payment == 0:
+            registered_At = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            c.execute(
+                "INSERT INTO CourseEnrollments (user_ID, first_name, last_name, course_ID, course_title, registered_at) "
+                "VALUES (?, ?, ?, ?, ?, ?)",
+                (user_id, first_name, last_name, course_id, course_title, registered_At)
+            )
+            conn.commit()
+            conn.close()
+            return 'successfully registered'
+        else:
+            conn.close()
+            return 'payment required'
+        
+        
+    def return_courses():
+        conn = sqlite3.connect("sqlite3.db")
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        query = "SELECT * FROM Course"
+        c.execute(query)
+        rows = c.fetchall()
+        conn.close()
+
+        courses = []
+        for row in rows:
+            kwargs = {
+                'ID' : row['ID'],
+                'title': row['title'],
+                'description': row['description'],
+                'instructor': row['instructor'],
+                'payment': row['payment'],
+                'cover_image': row['cover_image'],
+            }
+            courses.append(Course(**kwargs))
+        return courses

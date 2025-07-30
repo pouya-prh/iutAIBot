@@ -24,3 +24,10 @@ class Keyboard:
 
         return InlineKeyboardMarkup(keyboard)
 
+    def course_register_keyboard(course_title, course_id):
+        keyboard = [
+            [InlineKeyboardButton("ثبت‌نام در دوره ✏", callback_data=f"{course_title}_course register_{course_id}")]
+        ]
+
+        return InlineKeyboardMarkup(keyboard)
+

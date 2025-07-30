@@ -9,6 +9,8 @@ from show_events import show_events
 import event_register
 from logs import Logs
 from user_profile import UserProfile
+from show_courses import show_courses
+import course_register
 TOKEN = "" 
 try:
     with open('token.txt', 'r') as f:
@@ -44,7 +46,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif text == "رویدادها📅":
         await show_events(update,context)
     elif text == "دوره‌ها📚":
-        await update.message.reply_text("در حال حاضر اطلاعاتی ثبت نشده. منتظر خبرهای جدید باشید!")
+        await show_courses(update, context)
     else:
         await update.message.reply_text("دستور نامشخص است. لطفاً از دکمه‌ها استفاده کنید.")
 
@@ -96,6 +98,8 @@ def main():
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(
     event_register.handle_event_register_callback, pattern=r".+_register_\d+$"))
+    app.add_handler(CallbackQueryHandler(
+    course_register.handle_course_register_callback, pattern=r".+_course register_\d+$"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
 
