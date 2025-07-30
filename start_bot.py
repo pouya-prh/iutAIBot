@@ -13,6 +13,7 @@ from user_profile import UserProfile
 from show_courses import show_courses
 import course_register
 from display_user_event_course import display_user_event ,display_user_course
+from handle_video import return_file_id
 TOKEN = "" 
 try:
     with open('token.txt', 'r') as f:
@@ -107,12 +108,13 @@ def main():
     app.add_handler(profile_conv_handler)
     app.add_handler(suggestion_conv_handler) 
     app.add_handler(CommandHandler("start", start))
+    
     app.add_handler(CallbackQueryHandler(
     event_register.handle_event_register_callback, pattern=r".+_register_\d+$"))
     app.add_handler(CallbackQueryHandler(
     course_register.handle_course_register_callback, pattern=r".+_course register_\d+$"))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    
+    app.add_handler(MessageHandler(filters.VIDEO, return_file_id))
 
     app.run_polling()
 

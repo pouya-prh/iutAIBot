@@ -2,6 +2,11 @@ from telegram import Update
 from db_manager import DbManager
 from telegram.constants import ParseMode
 from events import Events
+from course import Course
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+
 def to_text(event):
         text = f"📌 <b>{event.title}</b>\n"
         text += f"{event.description}\n"
@@ -40,5 +45,17 @@ async def display_user_event(update: Update, context):
         )
 
 
-def display_user_course(update, context):
-    pass
+async def display_user_course(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    telegram_id = update.effective_user.id
+    courses = DbManager.get_user_courses(telegram_id)
+
+    if not courses:
+        await update.message.reply_text("🎓 شما در هیچ دوره‌ای ثبت‌نام نکردید.")
+        return
+    keyboard = [
+        [InlineKeyboardButton(text=title, callback_data=f"course:{course_id}")] for course_id, title in courses 
+
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("✅ لطفاً یکی از دوره‌ها را انتخاب کنید:", reply_markup=reply_markup)
+

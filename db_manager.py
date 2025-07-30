@@ -96,10 +96,6 @@ class DbManager:
         else:
             return 'payment'
             
-        
-
-            
-
     def get_user_profile(telegram_id):
         try:
             conn = sqlite3.connect("sqlite3.db")
@@ -155,8 +151,6 @@ class DbManager:
             print(f"Error saving user profile: {e}")
             conn.rollback()
 
-
-
     def course_register_db(telegram_id, course_id):
         conn = sqlite3.connect("sqlite3.db")
         c = conn.cursor()
@@ -202,7 +196,6 @@ class DbManager:
             conn.close()
             return 'payment'
         
-        
     def return_courses():
         conn = sqlite3.connect("sqlite3.db")
         conn.row_factory = sqlite3.Row
@@ -225,8 +218,6 @@ class DbManager:
             courses.append(Course(**kwargs))
         return courses
     
-    
-
     def return_user_event(telegram_id):
         conn = sqlite3.connect('sqlite3.db')
         conn.row_factory = sqlite3.Row
@@ -264,5 +255,31 @@ class DbManager:
         conn.close()
         return events
 
-            
+    def is_admin(telegram_id):
+        conn = sqlite3.connect('sqlite3.db')
+        c = conn.cursor()
+        c.execute(" SELECT is_admin FROM Users WHERE telegram_ID = ?",(telegram_id, ))
+        user_row = c.fetchone()
+        conn.close()
+        if user_row and user_row[0]:
+            return True
+        return False    
         
+    def get_user_courses(telegram_id):
+        conn = sqlite3.connect("sqlite3.db")
+        c = conn.cursor()
+        c.execute(" SELECT ID FROM Users WHERE telegram_ID = ?", (telegram_id, ))
+        user_row = c.fetchone()
+        if user_row:
+            user_id = user_row[0]
+        else:
+            return None
+        c.execute("""
+            SELECT DISTINCT course_ID, course_title FROM CourseEnrollments
+            WHERE user_ID = ?
+        """, (user_id,))
+        courses = [(row[0], row[1]) for row in c.fetchall()]
+        conn.close()
+        return courses
+    
+    
