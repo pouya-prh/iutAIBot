@@ -8,14 +8,19 @@ SUGGESTION = 1
 
 class Suggestion:
     async def ask_for_suggestion(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        telegram_id = update.effective_user.id
         
+        if DbManager.is_active(telegram_id):
 
-        await update.message.reply_text(
-            "💡 لطفاً پیشنهاد خود را ارسال کنید.\nیا با 'بازگشت 🔙' به منوی اصلی برگردید.",
-            reply_markup=Keyboard.back()
-        )
+            await update.message.reply_text(
+                "💡 لطفاً پیشنهاد خود را ارسال کنید.\nیا با 'بازگشت 🔙' به منوی اصلی برگردید.",
+                reply_markup=Keyboard.back()
+            )
 
-        return SUGGESTION
+            return SUGGESTION
+        else:
+            await context.bot.send_message(chat_id=telegram_id, text="❌ کاربری شما غیرفعال است.")
+            return ConversationHandler.END
 
     async def handle_suggestion(update: Update, context: ContextTypes.DEFAULT_TYPE):
         text = update.message.text

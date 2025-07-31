@@ -11,34 +11,38 @@ class UserProfile:
     @staticmethod
     async def start_profile_registration(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user = update.effective_user
+        telegram_id = user.id
         existing_profile = DbManager.get_user_profile(user.id)
-        
-        if existing_profile:
+        if DbManager.is_active(telegram_id):
+            if existing_profile:
 
-            context.user_data['existing_profile'] = existing_profile
-            
-            keyboard = [
-                [KeyboardButton("✏️ ویرایش پروفایل")],
-                [KeyboardButton("بازگشت 🔙")]
-            ]
-            
-            await update.message.reply_text(
-                f"📝 پروفایل فعلی شما:\n"
-                f"👤 نام: {existing_profile.get('first_name', 'ثبت نشده')}\n"
-                f"👥 نام خانوادگی: {existing_profile.get('last_name', 'ثبت نشده')}\n"
-                f"📞 شماره تلفن: {existing_profile.get('phone', 'ثبت نشده')}\n"
-                f"🏫 دانشگاه: {existing_profile.get('university', 'ثبت نشده')}\n"
-                f"📅 سال ورودی: {existing_profile.get('entry_year', 'ثبت نشده')}\n"
-                f"گزینه مورد نظر را انتخاب کنید:",
-                reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
-            )
-            return UserProfile.SHOW_PROFILE_OPTIONS 
+                context.user_data['existing_profile'] = existing_profile
+                
+                keyboard = [
+                    [KeyboardButton("✏️ ویرایش پروفایل")],
+                    [KeyboardButton("بازگشت 🔙")]
+                ]
+                
+                await update.message.reply_text(
+                    f"📝 پروفایل فعلی شما:\n"
+                    f"👤 نام: {existing_profile.get('first_name', 'ثبت نشده')}\n"
+                    f"👥 نام خانوادگی: {existing_profile.get('last_name', 'ثبت نشده')}\n"
+                    f"📞 شماره تلفن: {existing_profile.get('phone', 'ثبت نشده')}\n"
+                    f"🏫 دانشگاه: {existing_profile.get('university', 'ثبت نشده')}\n"
+                    f"📅 سال ورودی: {existing_profile.get('entry_year', 'ثبت نشده')}\n"
+                    f"گزینه مورد نظر را انتخاب کنید:",
+                    reply_markup=ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
+                )
+                return UserProfile.SHOW_PROFILE_OPTIONS 
+            else:
+                await update.message.reply_text(
+                    "👤 لطفاً نام خود را وارد کنید:",
+                    reply_markup=Keyboard.back()
+                )
+                return UserProfile.PROFILE_FIRST_NAME
         else:
-            await update.message.reply_text(
-                "👤 لطفاً نام خود را وارد کنید:",
-                reply_markup=Keyboard.back()
-            )
-            return UserProfile.PROFILE_FIRST_NAME
+            await context.bot.send_message(chat_id=telegram_id, text="❌ کاربری شما غیرفعال است.")
+            return ConversationHandler.END
         
         
     @staticmethod

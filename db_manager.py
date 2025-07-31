@@ -282,6 +282,16 @@ class DbManager:
         conn.close()
         return courses
     
+    def is_active(telegram_id):
+        conn = sqlite3.connect('sqlite3.db')
+        c = conn.cursor()
+        c.execute("SELECT is_active FROM Users WHERE telegram_ID = ?", (telegram_id, ))
+        row = c.fetchone()
+        c.close()
+        if row and row[0] == 0:
+            return False
+        return True
+    
     def return_all_episode_of_course(course_id):
         conn = sqlite3.connect('sqlite3.db')
         c = conn.cursor()

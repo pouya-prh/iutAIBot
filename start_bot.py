@@ -27,35 +27,41 @@ except FileNotFoundError:
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
-
     telegram_id = user.id
     username = user.username
     first_name = user.first_name
     last_name = user.last_name
-
-    DbManager.insert_user(telegram_id, username, first_name, last_name)
-    await update.message.reply_text(
-        "🎉 خوش آمدید به ربات ما! لطفاً یکی از گزینه‌ها را انتخاب کنید:",
-         reply_markup=Keyboard.main_menu_keyboard()
-    )
-    
+    if DbManager.is_active(telegram_id):
+        DbManager.insert_user(telegram_id, username, first_name, last_name)
+        await update.message.reply_text(
+            "🎉 خوش آمدید به ربات ما! لطفاً یکی از گزینه‌ها را انتخاب کنید:",
+            reply_markup=Keyboard.main_menu_keyboard()
+        )
+    else:
+       await context.bot.send_message(chat_id=telegram_id, text="❌ کاربری شما غیرفعال است.")
     Logs.start_clicked(telegram_id,first_name)
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    text = update.message.text
+    user = update.effective_user
+    telegram_id = user.id
+    if DbManager.is_active(telegram_id):
+        text = update.message.text
 
-    if text == "درباره ما❔":
-        await about.about_us(update, context)
-    elif text == "رویدادها📅":
-        await show_events(update,context)
-    elif text == "دوره‌ها📚":
-        await show_courses(update, context)
-    elif text == "رویداد های من📆" :
-        await display_user_event(update, context)
-    elif text == "دوره های من📘" :
-        await display_user_course(update, context)
+        if text == "درباره ما❔":
+            await about.about_us(update, context)
+        elif text == "رویدادها📅":
+            await show_events(update,context)
+        elif text == "دوره‌ها📚":
+            await show_courses(update, context)
+        elif text == "رویداد های من📆" :
+            await display_user_event(update, context)
+        elif text == "دوره های من📘" :
+            await display_user_course(update, context)
+        else:
+            await update.message.reply_text("دستور نامشخص است. لطفاً از دکمه‌ها استفاده کنید.")
     else:
-        await update.message.reply_text("دستور نامشخص است. لطفاً از دکمه‌ها استفاده کنید.")
+        await context.bot.send_message(chat_id=telegram_id, text="❌ کاربری شما غیرفعال است.")
+        
 
 def main():
     
